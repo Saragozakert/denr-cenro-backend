@@ -1,5 +1,4 @@
 <?php
-// routes/api.php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -7,7 +6,8 @@ use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\UserAuthenticationController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\FuelRequestController; // Add this line
+use App\Http\Controllers\FuelRequestController;
+use App\Http\Controllers\RequestingPartyController; // Add this line
 
 // Public routes
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
@@ -38,6 +38,12 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/admin/fuel-requests', [FuelRequestController::class, 'index']);
     Route::put('/admin/fuel-requests/{id}/status', [FuelRequestController::class, 'updateStatus']);
     Route::put('/admin/fuel-requests/{id}/amount', [FuelRequestController::class, 'updateAmount']);
+
+    // Requesting Party management routes (Add these lines)
+    Route::get('/admin/requesting-parties', [RequestingPartyController::class, 'index']);
+    Route::post('/admin/requesting-parties', [RequestingPartyController::class, 'store']);
+    Route::put('/admin/requesting-parties/{id}', [RequestingPartyController::class, 'update']);
+    Route::delete('/admin/requesting-parties/{id}', [RequestingPartyController::class, 'destroy']);
 });
 
 // User routes
