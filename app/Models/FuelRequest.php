@@ -15,6 +15,7 @@ class FuelRequest extends Model
         'vehicle_type',
         'model_name',
         'plate_no',
+        'requesting_party', // Add this line
         'section',
         'office',
         'purchased_no',

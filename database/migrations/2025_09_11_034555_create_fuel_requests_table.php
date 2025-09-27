@@ -15,6 +15,7 @@ class CreateFuelRequestsTable extends Migration
             $table->string('vehicle_type');
             $table->string('model_name');
             $table->string('plate_no');
+            $table->string('requesting_party');
             $table->string('section');
             $table->string('office');
             $table->string('purchased_no')->nullable();

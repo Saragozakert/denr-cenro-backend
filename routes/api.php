@@ -7,7 +7,7 @@ use App\Http\Controllers\UserAuthenticationController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FuelRequestController;
-use App\Http\Controllers\RequestingPartyController; // Add this line
+use App\Http\Controllers\RequestingPartyController;
 
 // Public routes
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
@@ -39,7 +39,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::put('/admin/fuel-requests/{id}/status', [FuelRequestController::class, 'updateStatus']);
     Route::put('/admin/fuel-requests/{id}/amount', [FuelRequestController::class, 'updateAmount']);
 
-    // Requesting Party management routes (Add these lines)
+    // Requesting Party management routes
     Route::get('/admin/requesting-parties', [RequestingPartyController::class, 'index']);
     Route::post('/admin/requesting-parties', [RequestingPartyController::class, 'store']);
     Route::put('/admin/requesting-parties/{id}', [RequestingPartyController::class, 'update']);
@@ -53,6 +53,9 @@ Route::prefix('user')->group(function () {
 
     Route::get('/units', [UnitController::class, 'index']);
     Route::get('/employees', [EmployeeController::class, 'indexForUsers']);
+    
+    // Add this line for user-accessible requesting parties
+    Route::get('/requesting-parties', [RequestingPartyController::class, 'index']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthenticationController::class, 'logout']);

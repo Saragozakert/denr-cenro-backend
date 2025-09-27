@@ -7,6 +7,7 @@ use App\Models\FuelRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Employee;
+use App\Models\RequestingParty; // Add this import
 
 class FuelRequestController extends Controller
 {
@@ -37,6 +38,7 @@ class FuelRequestController extends Controller
                 'vehicle_type' => 'required|string|max:255',
                 'model_name' => 'required|string|max:255',
                 'plate_no' => 'required|string|max:255',
+                'requesting_party' => 'required|string|max:255', // Add validation
                 'section' => 'required|string|max:255',
                 'office' => 'required|string|max:255',
                 'purchased_no' => 'nullable|string|max:255',
@@ -44,7 +46,7 @@ class FuelRequestController extends Controller
                 'fuel_type' => 'required|string|max:255',
                 'gasoline_amount' => 'required|numeric|min:0',
                 'withdrawn_by' => 'required|string|max:255',
-                'approved_by' => 'required|string|max:255', // This should be the name, not ID
+                'approved_by' => 'required|string|max:255',
                 'issued_by' => 'nullable|string|max:255'
             ]);
 
@@ -65,11 +67,21 @@ class FuelRequestController extends Controller
                 }
             }
 
+            // Get the requesting party name from the ID if it's a numeric value
+            $requestingPartyName = $request->requesting_party;
+            if (is_numeric($request->requesting_party)) {
+                $requestingParty = RequestingParty::find($request->requesting_party);
+                if ($requestingParty) {
+                    $requestingPartyName = $requestingParty->full_name;
+                }
+            }
+
             $fuelRequest = FuelRequest::create([
                 'date' => now()->format('Y-m-d'),
                 'vehicle_type' => $request->vehicle_type,
                 'model_name' => $request->model_name,
                 'plate_no' => $request->plate_no,
+                'requesting_party' => $requestingPartyName, // Add this line
                 'section' => $request->section,
                 'office' => $request->office,
                 'purchased_no' => $request->purchased_no,
@@ -77,7 +89,7 @@ class FuelRequestController extends Controller
                 'fuel_type' => $request->fuel_type,
                 'gasoline_amount' => $request->gasoline_amount,
                 'withdrawn_by' => $request->withdrawn_by,
-                'approved_by' => $approvedByName, // Store the name, not ID
+                'approved_by' => $approvedByName,
                 'issued_by' => $request->issued_by,
                 'status' => 'pending'
             ]);
