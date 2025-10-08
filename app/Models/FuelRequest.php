@@ -15,11 +15,13 @@ class FuelRequest extends Model
         'vehicle_type',
         'model_name',
         'plate_no',
-        'requesting_party', // Add this line
+        'requesting_party',
         'section',
         'office',
         'purchased_no',
         'purpose',
+        'places_to_visit', // Add this
+        'authorized_passengers', // Add this
         'fuel_type',
         'gasoline_amount',
         'withdrawn_by',
