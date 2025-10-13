@@ -12,10 +12,34 @@ use App\Models\RequestingParty; // Add this import
 class FuelRequestController extends Controller
 {
     // Get all fuel requests (for admin)
+    // Get all fuel requests (for admin)
     public function index(Request $request)
     {
         try {
             $fuelRequests = FuelRequest::orderBy('created_at', 'desc')->get();
+            
+            // For existing records without position data, try to populate them
+            foreach ($fuelRequests as $fuelRequest) {
+                // For requesting party position
+                if (empty($fuelRequest->position) || $fuelRequest->position === 'N/A') {
+                    $requestingParty = RequestingParty::where('full_name', $fuelRequest->requesting_party)->first();
+                    if ($requestingParty) {
+                        $fuelRequest->position = $requestingParty->position;
+                        // Save the update to the database
+                        $fuelRequest->save();
+                    }
+                }
+                
+                // FIXED: For approve section position - find by approved_by name
+                if (empty($fuelRequest->approve_section_position) || $fuelRequest->approve_section_position === 'N/A') {
+                    $employee = Employee::where('name', $fuelRequest->approved_by)->first();
+                    if ($employee) {
+                        $fuelRequest->approve_section_position = $employee->position;
+                        // Save the update to the database
+                        $fuelRequest->save();
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -30,7 +54,6 @@ class FuelRequestController extends Controller
         }
     }
 
-    // Store a new fuel request (for user)
     public function store(Request $request)
     {
         try {
@@ -43,13 +66,14 @@ class FuelRequestController extends Controller
                 'office' => 'required|string|max:255',
                 'purchased_no' => 'nullable|string|max:255',
                 'purpose' => 'required|string',
-                'places_to_visit' => 'nullable|string', // Add this
-                'authorized_passengers' => 'nullable|string', // Add this
+                'places_to_visit' => 'nullable|string',
+                'authorized_passengers' => 'nullable|string',
                 'fuel_type' => 'required|string|max:255',
                 'gasoline_amount' => 'required|numeric|min:0',
                 'withdrawn_by' => 'required|string|max:255',
                 'approved_by' => 'required|string|max:255',
-                'issued_by' => 'nullable|string|max:255'
+                'issued_by' => 'nullable|string|max:255',
+                'approve_section_position' => 'nullable|string|max:255'
             ]);
 
             if ($validator->fails()) {
@@ -69,12 +93,30 @@ class FuelRequestController extends Controller
                 }
             }
 
-            // Get the requesting party name from the ID if it's a numeric value
+            // Get the requesting party name and position
             $requestingPartyName = $request->requesting_party;
+            $position = null;
+            
             if (is_numeric($request->requesting_party)) {
                 $requestingParty = RequestingParty::find($request->requesting_party);
                 if ($requestingParty) {
                     $requestingPartyName = $requestingParty->full_name;
+                    $position = $requestingParty->position;
+                }
+            } else {
+                // If requesting_party is already a name, find the position
+                $requestingParty = RequestingParty::where('full_name', $request->requesting_party)->first();
+                if ($requestingParty) {
+                    $position = $requestingParty->position;
+                }
+            }
+
+            // Get approve section position from employee by withdrawn_by name
+            $approveSectionPosition = $request->approve_section_position;
+            if (!$approveSectionPosition) {
+                $employee = Employee::where('name', $request->withdrawn_by)->first();
+                if ($employee) {
+                    $approveSectionPosition = $employee->position;
                 }
             }
 
@@ -88,13 +130,15 @@ class FuelRequestController extends Controller
                 'office' => $request->office,
                 'purchased_no' => $request->purchased_no,
                 'purpose' => $request->purpose,
-                'places_to_visit' => $request->places_to_visit, // Add this
-                'authorized_passengers' => $request->authorized_passengers, // Add this
+                'places_to_visit' => $request->places_to_visit,
+                'authorized_passengers' => $request->authorized_passengers,
                 'fuel_type' => $request->fuel_type,
                 'gasoline_amount' => $request->gasoline_amount,
                 'withdrawn_by' => $request->withdrawn_by,
                 'approved_by' => $approvedByName,
                 'issued_by' => $request->issued_by,
+                'position' => $position,
+                'approve_section_position' => $approveSectionPosition,
                 'status' => 'pending'
             ]);
 
@@ -113,7 +157,7 @@ class FuelRequestController extends Controller
         }
     }
 
-    // Update fuel request status (for admin)
+ 
     public function updateStatus(Request $request, $id)
     {
         try {

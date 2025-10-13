@@ -20,13 +20,15 @@ class FuelRequest extends Model
         'office',
         'purchased_no',
         'purpose',
-        'places_to_visit', // Add this
-        'authorized_passengers', // Add this
+        'places_to_visit',
+        'authorized_passengers',
         'fuel_type',
         'gasoline_amount',
         'withdrawn_by',
         'approved_by',
         'issued_by',
+        'position', // Existing position for RequestingPartyTable
+        'approve_section_position', // New position for ApproveSectionTable
         'status'
     ];
 
