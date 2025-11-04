@@ -27,9 +27,8 @@ class FuelRequest extends Model
         'withdrawn_by',
         'approved_by',
         'issued_by',
-        'position', // Existing position for RequestingPartyTable
-        'approve_section_position', // New position for ApproveSectionTable
-        'status'
+        'position', 
+        'approve_section_position', 
     ];
 
     protected $casts = [
