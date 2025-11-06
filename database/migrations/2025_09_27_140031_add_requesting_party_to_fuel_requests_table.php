@@ -6,19 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
     public function up(): void
     {
         Schema::table('fuel_requests', function (Blueprint $table) {
             $table->string('requesting_party')->after('plate_no');
         });
     }
+    
+    /* e replace rani sa ubos if mag repo clone ang current the public sa taas ani*/
+    /* public function up(); void
+    {
+        Schema::table('fuel_requests', function (Blueprint $table) {
+            if (!Schema::hasColumn('fuel_requests', 'requesting_party')) {
+                $table->string('requesting_party')->after('plate_no');
+            }
+        });
+    }
+    */
 
-    /**
-     * Reverse the migrations.
-     */
+    
     public function down(): void
     {
         Schema::table('fuel_requests', function (Blueprint $table) {
