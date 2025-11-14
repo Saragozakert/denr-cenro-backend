@@ -8,6 +8,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FuelRequestController;
 use App\Http\Controllers\RequestingPartyController;
+use App\Http\Controllers\TripTicketController;
 
 // Public routes
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
@@ -16,6 +17,9 @@ Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::middleware(['auth:admin'])->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout']);
     Route::get('/admin/check-auth', [AdminAuthController::class, 'checkAuth']);
+
+    Route::get('/admin/trip-tickets', [TripTicketController::class, 'getAll']);
+    Route::get('/admin/trip-tickets/{fuelRequestId}', [TripTicketController::class, 'getByFuelRequest']);
 
     // User management routes
     Route::get('/admin/users', [UserAuthenticationController::class, 'index']);
@@ -53,13 +57,15 @@ Route::prefix('user')->group(function () {
 
     Route::get('/units', [UnitController::class, 'index']);
     Route::get('/employees', [EmployeeController::class, 'indexForUsers']);
-    
-    // Add this line for user-accessible requesting parties
     Route::get('/requesting-parties', [RequestingPartyController::class, 'index']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthenticationController::class, 'logout']);
         Route::get('/check-auth', [UserAuthenticationController::class, 'checkAuth']);
+
+        // Trip Ticket routes (User) - FIXED: Add /user prefix
+        Route::post('/trip-tickets', [TripTicketController::class, 'store']);
+        Route::get('/trip-tickets/{fuelRequestId}', [TripTicketController::class, 'getByFuelRequest']);
 
         // Fuel request routes (User)
         Route::post('/fuel-requests', [FuelRequestController::class, 'store']);
