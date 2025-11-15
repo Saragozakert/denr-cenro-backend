@@ -48,6 +48,10 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::post('/admin/requesting-parties', [RequestingPartyController::class, 'store']);
     Route::put('/admin/requesting-parties/{id}', [RequestingPartyController::class, 'update']);
     Route::delete('/admin/requesting-parties/{id}', [RequestingPartyController::class, 'destroy']);
+    Route::get('/admin/trip-ticket-statuses', [TripTicketController::class, 'getAllStatuses']);
+
+     Route::get('/admin/trip-tickets-admin', [TripTicketController::class, 'getAdminTripTickets']);
+    Route::put('/admin/trip-tickets/{id}/status', [TripTicketController::class, 'updateStatus']);
 });
 
 // User routes
@@ -66,6 +70,9 @@ Route::prefix('user')->group(function () {
         // Trip Ticket routes (User) - FIXED: Add /user prefix
         Route::post('/trip-tickets', [TripTicketController::class, 'store']);
         Route::get('/trip-tickets/{fuelRequestId}', [TripTicketController::class, 'getByFuelRequest']);
+
+        Route::get('/user-trip-tickets', [TripTicketController::class, 'getUserTripTickets']);
+         Route::get('/fuel-requests-with-trip-status', [TripTicketController::class, 'getFuelRequestsWithTripTicketStatus']);
 
         // Fuel request routes (User)
         Route::post('/fuel-requests', [FuelRequestController::class, 'store']);
